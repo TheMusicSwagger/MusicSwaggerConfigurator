@@ -3,6 +3,7 @@ var working_area, toolbar, canvas, context; // global vars
 var tool_counter = 0;
 var pseudo_link_counter = 0;
 var link_counter = 0;
+// TODO: CHANGE TO AN ARRAY OF TAKEN LINK NUMBERS
 
 window.onload = function () {
     // getting basic elements
@@ -92,9 +93,12 @@ function drop(event) {
             currently_dragged.style.top = (event.clientY + parseInt(offset[1], 10)) + "px";
         } else if (drop_target_class == "toolbar") {
             var links = currently_dragged.querySelector(".link");
-            for (var i = 0; i < links.length; i++) {
-                remove_link(links[i].getAttribute("id"));
+            if (links != null) {
+                for (var i = 0; i < links.length; i++) {
+                    remove_link(links[i].getAttribute("id"));
+                }
             }
+
             currently_dragged.parentNode.removeChild(currently_dragged);
         }
     } else if (current_class == "pseudo_link") {
@@ -214,3 +218,17 @@ function drawLineBetweenDiv(div1, div2) {
     context.stroke();
 }
 
+function get_link_parent(linkid) {
+    return document.getElementById(linkid).parentNode.parentNode.getAttribute("id").split("_")[0];
+}
+
+function get_linked(index) {
+    return [get_link_parent("link_0_" + index.toString()), get_link_parent("link_1_" + index.toString())];
+}
+
+function save_data() {
+    for (var i = 0; i < link_counter; i++) {
+        var a = get_linked(i);
+        alert(a[0] + " --- " + a[1]);
+    }
+}
