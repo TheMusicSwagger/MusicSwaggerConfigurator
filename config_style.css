@@ -31,9 +31,12 @@ body {
 .tool {
     color: white;
     text-align: center;
-    background-color: pink;
+    background-color: hotpink;
     width: 100px;
     height: 100px;
+    border-radius: 20px;
+    border-style: none;
+    box-shadow: 0 10px 20px 0 rgba(0, 0, 0, 0.5), 0 20px 30px 20px rgba(0, 0, 0, 0.19);
 }
 
 #main_cavas {
@@ -74,3 +77,14 @@ body {
     cursor: grabbing;
 }
 
+#save_button {
+    position: fixed;
+    background-color: hotpink;
+    right: 0;
+    bottom: 0;
+    margin: 30px;
+    padding: 20px 50px;
+    border-radius: 20px;
+    border-style: none;
+    box-shadow: 0 10px 20px 0 rgba(0, 0, 0, 0.5), 0 20px 30px 20px rgba(0, 0, 0, 0.19);
+}
