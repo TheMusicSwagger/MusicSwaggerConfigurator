@@ -1,24 +1,33 @@
 <!DOCTYPE html>
 <html>
+
 <head>
+    <meta charset="utf-8" />
     <title>Config Page</title>
     <link rel="stylesheet" type="text/css" href="config_style.css">
-    <script src="config_script.js"></script>
+    <script src="config_script2.js"></script>
 </head>
+
 <body>
-<div id="working_area">
-    <div id="toolbar">
+    <div id="toolbar" class="toolbar">
         <div class="toolcontainer">
-            <div draggable="true" class="tool">
+            <div draggable="true" class="tool" id="tool1">
                 I'm a tool !
+                <div class="link_container"></div>
             </div>
         </div>
         <div class="toolcontainer">
-            <div draggable="true" class="tool">
+            <div draggable="true" class="tool" id="tool2">
                 I'm another tool !
+                <div class="link_container"></div>
             </div>
         </div>
     </div>
-</div>
+    <div id="working_area" class="working_area">
+
+    </div>
+    <canvas id="main_cavas"></canvas>
 </body>
+
 </html>
+
