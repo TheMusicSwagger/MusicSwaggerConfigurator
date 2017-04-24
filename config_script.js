@@ -3,7 +3,10 @@ var working_area, toolbar, canvas, context; // global vars
 var tool_counter = 0;
 var pseudo_link_counter = 0;
 var link_counter = 0;
-// TODO: CHANGE TO AN ARRAY OF TAKEN LINK NUMBERS
+var available_links = [];
+
+// TO FIX -> DOUBLE DROP
+var drop_counter = 0;
 
 window.onload = function () {
     // getting basic elements
@@ -41,12 +44,19 @@ function get_link_id(link) {
 }
 
 function remove_link(id) {
-    var link0 = document.getElementById("link_0_" + id),
-        link1 = document.getElementById("link_0_" + id);
-    link0.parentNode.appendChild(create_pseudo_link());
-    link1.parentNode.appendChild(create_pseudo_link());
-    link0.parentNode.removeChild(link0);
-    link1.parentNode.removeChild(link1);
+    console.log("Available :" + available_links + " " + id);
+    var index = available_links.indexOf(id);
+    if (index > -1) {
+        var link0 = document.getElementById("link_0_" + id),
+            link1 = document.getElementById("link_0_" + id);
+        link0.parentNode.appendChild(create_pseudo_link());
+        link1.parentNode.appendChild(create_pseudo_link());
+        link0.parentNode.removeChild(link0);
+        link1.parentNode.removeChild(link1);
+        available_links.splice(index, 1);
+    } else {
+        console.log("Link doesn't exists !");
+    }
 }
 
 function get_formatted_data(div, other) {
@@ -78,11 +88,13 @@ function create_pseudo_link() {
 }
 
 function drop(event) {
-    event.preventDefault();
+    if (drop_counter == 0) {
+        return;
+    }
+    drop_counter--;
     var pdata = parse_formatted_data(event.dataTransfer.getData("text/plain"));
     var drop_target = event.target;
     var drop_target_class = drop_target.getAttribute("class");
-    console.log(pdata);
     var currently_dragged = document.getElementById(pdata[0]);
     var current_class = currently_dragged.getAttribute("class");
     console.log("Drop : " + current_class + " -> " + drop_target_class);
@@ -129,6 +141,7 @@ function drop(event) {
             parent_target.removeChild(drop_target);
 
             // link created
+            available_links.push(link_counter);
             link_counter++;
         }
     } else if (current_class == "link") {
@@ -137,11 +150,13 @@ function drop(event) {
             if (drop_target_class == "link") {
                 container = drop_target.parentNode;
             }
+            remove_link(get_link_id(container.childNodes[0]));
+        } else if (drop_target_class == "working_area" || drop_target_class == "toolbar") {
             remove_link(get_link_id(currently_dragged));
         }
-
     }
     update_links();
+    event.preventDefault();
 }
 
 function drag_over(event) {
@@ -149,6 +164,7 @@ function drag_over(event) {
 }
 
 function drag_start(event) {
+    drop_counter++;
     var currently_dragged = event.target;
     var current_class = currently_dragged.getAttribute("class");
     console.log("Drag : " + current_class);
@@ -157,6 +173,7 @@ function drag_start(event) {
             // tool is in the toolbar
             // replacing tool
             var replacement_tool = currently_dragged.cloneNode(true);
+            replacement_tool.addEventListener("dragover", drag_over, false);
             replacement_tool.addEventListener("dragstart", drag_start, false);
 
 
@@ -227,8 +244,8 @@ function get_linked(index) {
 }
 
 function save_data() {
-    for (var i = 0; i < link_counter; i++) {
-        var a = get_linked(i);
+    for (var i = 0; i < available_links.length; i++) {
+        var a = get_linked(available_links[i]);
         alert(a[0] + " --- " + a[1]);
     }
 }
