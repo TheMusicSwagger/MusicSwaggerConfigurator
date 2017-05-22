@@ -5,7 +5,6 @@ var pseudo_link_counter = 0;
 var link_counter = 0;
 var available_links = [];
 
-// TO FIX -> DOUBLE DROP
 var drop_counter = 0;
 
 window.onload = function () {
@@ -44,11 +43,11 @@ function get_link_id(link) {
 }
 
 function remove_link(id) {
-    console.log("Available :" + available_links + " " + id);
     var index = available_links.indexOf(id);
+    console.log(available_links);
     if (index > -1) {
         var link0 = document.getElementById("link_0_" + id),
-            link1 = document.getElementById("link_0_" + id);
+            link1 = document.getElementById("link_1_" + id);
         link0.parentNode.appendChild(create_pseudo_link());
         link1.parentNode.appendChild(create_pseudo_link());
         link0.parentNode.removeChild(link0);
@@ -57,6 +56,8 @@ function remove_link(id) {
     } else {
         console.log("Link doesn't exists !");
     }
+
+    console.log(available_links);
 }
 
 function get_formatted_data(div, other) {
@@ -104,10 +105,10 @@ function drop(event) {
             currently_dragged.style.left = (event.clientX + parseInt(offset[0], 10)) + "px";
             currently_dragged.style.top = (event.clientY + parseInt(offset[1], 10)) + "px";
         } else if (drop_target_class == "toolbar") {
-            var links = currently_dragged.querySelector(".link");
+            var links = currently_dragged.querySelectorAll(".link");
             if (links != null) {
                 for (var i = 0; i < links.length; i++) {
-                    remove_link(links[i].getAttribute("id"));
+                    remove_link(get_link_id(links[i]));
                 }
             }
 
@@ -141,7 +142,7 @@ function drop(event) {
             parent_target.removeChild(drop_target);
 
             // link created
-            available_links.push(link_counter);
+            available_links.push(link_counter.toString());
             link_counter++;
         }
     } else if (current_class == "link") {
@@ -167,7 +168,7 @@ function drag_start(event) {
     drop_counter++;
     var currently_dragged = event.target;
     var current_class = currently_dragged.getAttribute("class");
-    console.log("Drag : " + current_class);
+    console.log("Drag : " + current_class + " " + currently_dragged.getAttribute("id"));
     if (current_class == "tool") {
         if (currently_dragged.parentNode.getAttribute("class") == "toolcontainer") {
             // tool is in the toolbar
@@ -210,20 +211,31 @@ function drag_start(event) {
     } else if (current_class == "pseudo_link") {
         event.dataTransfer.setData("text/plain", get_formatted_data(currently_dragged, []));
     }
+    event.stopPropagation();
 }
 
 function update_links() {
     clearCanvas();
-    for (var i = 0; i < link_counter; i++) {
-        new drawLineBetweenDiv(document.getElementById("link_0_" + i.toString()), document.getElementById("link_1_" + i.toString()));
-    }
+    available_links.forEach(function (e) {
+        new drawLineBetweenDiv("link_0_" + e, "link_1_" + e);
+    });
 }
 
 function clearCanvas() {
     context.clearRect(0, 0, canvas.width, canvas.height);
 }
 
-function drawLineBetweenDiv(div1, div2) {
+function drawLineBetweenDiv(id_div1, id_div2) {
+    var div1 = document.getElementById(id_div1),
+        div2 = document.getElementById(id_div2);
+    if (div1 == null) {
+        console.log("Div1 not found : " + id_div1);
+        return;
+    }
+    if (div2 == null) {
+        console.log("Div2 not found : " + id_div2);
+        return;
+    }
     context.strokeStyle = 'orange';
     context.lineWidth = 4;
     context.lineCap = "round";
