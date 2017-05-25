@@ -1,9 +1,10 @@
-var working_area, toolbar, canvas, context; // global vars
+var working_area, toolbar, canvas, context, save_form, config_input; // global vars
 
 var tool_counter = 0;
 var pseudo_link_counter = 0;
 var link_counter = 0;
 var available_links = [];
+var available_boxes = [];
 
 var drop_counter = 0;
 
@@ -12,6 +13,9 @@ window.onload = function () {
     working_area = document.getElementById("working_area");
     canvas = document.getElementById("main_cavas");
     toolbar = document.getElementById("toolbar");
+    save_form = document.getElementById("save_form");
+    config_input = document.getElementById("config_input");
+
 
     // adding drag functionality to tools
     var tools = toolbar.querySelectorAll(".tool");
@@ -191,6 +195,7 @@ function drag_start(event) {
 
             // set id of tool
             currently_dragged.setAttribute("id", currently_dragged.getAttribute("id") + "_" + tool_counter.toString())
+            currently_dragged.setAttribute("data-boxid", tool_counter.toString())
 
             // create links
             var links = currently_dragged.querySelectorAll(".link_container");
@@ -199,6 +204,7 @@ function drag_start(event) {
                 links[i].appendChild(create_pseudo_link());
                 links[i].addEventListener("dragover", drag_over, false);
                 links[i].addEventListener("drop", drop, false);
+                links[i].setAttribute("data-linkid", i);
             }
             // added a tool
             tool_counter++;
@@ -247,17 +253,43 @@ function drawLineBetweenDiv(id_div1, id_div2) {
     context.stroke();
 }
 
-function get_link_parent(linkid) {
-    return document.getElementById(linkid).parentNode.parentNode.getAttribute("id").split("_")[0];
+function get_link_tool_id(linkid) {
+    var parent = document.getElementById(linkid).parentNode;
+    while (true) {
+        if (parent.getAttribute("class") == "tool") {
+            return parent.getAttribute("data-boxid");
+        }
+        parent = parent.parentNode;
+    }
+}
+
+function get_link_number(linkid) {
+    return document.getElementById(linkid).getAttribute("data-linkid");
 }
 
 function get_linked(index) {
-    return [get_link_parent("link_0_" + index.toString()), get_link_parent("link_1_" + index.toString())];
+    return [document.getElementById(get_link_tool_id("link_0_" + index.toString())), document.getElementById(get_link_tool_id("link_1_" + index.toString()))];
 }
 
 function save_data() {
+    var dataDict;
+    var links = [];
     for (var i = 0; i < available_links.length; i++) {
         var a = get_linked(available_links[i]);
-        alert(a[0] + " --- " + a[1]);
+        var link = {
+            "BOX_ID_1": a[0].getAttribute("data-boxid"),
+            "LINK_ID_1": a[0][1],
+            "BOX_ID_2": a[1].getAttribute("data-boxid"),
+            "LINK_ID_2": a[1][1]
+        };
+        // json data to send
+        // array("LINKS"=>array(array("BOX_ID_1"=>"1","LINK_ID_1"=>"1","BOX_ID_2"=>"2","LINK_ID_2"=>"1")),"BOXES"=>array(array("TYPE"=>"IN","BOX_ID"=>"1","SPEC_PARAM"=>"hello"),array("TYPE"=>"OUT","BOX_ID"=>"2","SPEC_PARAM"=>"hello2")))
+        links.push(link);
     }
+    dataDict.push(links);
+    for (var i = 0; i < available_boxes.length; i++) {
+
+    }
+    config_input.setAttribute("value", JSON.stringify(dataDict));
+    save_form.submit();
 }

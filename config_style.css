@@ -55,7 +55,7 @@ body {
     padding: 5px;
     text-align: center;
     background-color: lightblue;
-    position: absolute;
+    position: relative;
 }
 
 .pseudo_link {
@@ -78,6 +78,22 @@ body {
 
 .tool:active {
     cursor: grabbing;
+}
+
+.links_container {
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+}
+
+.inputs {
+    display: inline;
+    float: left;
+}
+
+.outputs {
+    display: inline;
+    float: right;
 }
 
 #save_button {
