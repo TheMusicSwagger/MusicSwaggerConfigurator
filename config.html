@@ -15,7 +15,7 @@
                 I'm a tool !
                 <div class="links_container">
                     <div class="inputs">
-                        <div class="link_container"></div>
+
                     </div>
                     <div class="outputs">
                         <div class="link_container"></div>
@@ -29,6 +29,7 @@
                 <div class="links_container">
                     <div class="inputs">
                         <div class="link_container"></div>
+                        <div class="link_container"></div>
                     </div>
                     <div class="outputs">
                         <div class="link_container"></div>
@@ -38,7 +39,17 @@
         </div>
     </div>
     <div id="working_area" class="working_area">
-
+        <div data-boxid="0" class="tool" id="output">
+            Output
+            <div class="links_container">
+                <div class="inputs"></div>
+                <div class="outputs">
+                    <div data-linkid="0" class="link_container">
+                        <div id="pseudo_link_0" draggable="true" class="pseudo_link"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     <canvas id="main_cavas"></canvas>
     <button type="button" id="save_button" onclick="save_data()">Save !</button>

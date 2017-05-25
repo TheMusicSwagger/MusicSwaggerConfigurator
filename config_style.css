@@ -3,7 +3,7 @@ body {
     height: 100%;
     margin: 0px;
     padding: 0px;
-    font-size: 18px;
+    font-size: 13px;
     font-family: sans-serif;
 }
 
@@ -35,7 +35,6 @@ body {
     text-align: center;
     background-color: hotpink;
     width: 100px;
-    height: 100px;
     padding: 20px;
     border-radius: 20px;
     border-style: none;
@@ -53,6 +52,7 @@ body {
 
 .link_container {
     padding: 5px;
+    margin: 10px 0;
     text-align: center;
     background-color: lightblue;
     position: relative;
@@ -84,16 +84,12 @@ body {
     display: flex;
     justify-content: space-between;
     flex-direction: row;
+    position: relative;
 }
 
-.inputs {
-    display: inline;
-    float: left;
-}
-
-.outputs {
-    display: inline;
-    float: right;
+.inputs .outputs {
+    display: flex;
+    flex-direction: row;
 }
 
 #save_button {

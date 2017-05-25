@@ -1,7 +1,10 @@
 var working_area, toolbar, canvas, context, save_form, config_input; // global vars
 
-var tool_counter = 0;
-var pseudo_link_counter = 0;
+var tool_counter = 1;
+var pseudo_link_counter = 1;
+// out is 0
+
+
 var link_counter = 0;
 var available_links = [];
 var available_boxes = [];
