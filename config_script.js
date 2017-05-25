@@ -195,6 +195,9 @@ function drag_start(event) {
             currently_dragged.parentNode.appendChild(replacement_tool);
             working_area.appendChild(currently_dragged);
 
+            // make links_container visible
+            currently_dragged.querySelector(".links_container").setAttribute("style", "display:flex");
+
 
             // set id of tool
             currently_dragged.setAttribute("id", currently_dragged.getAttribute("id") + "_" + tool_counter.toString())

@@ -85,7 +85,7 @@ body {
 }
 
 .links_container {
-    display: flex;
+    display: none;
     justify-content: space-between;
     flex-direction: row;
     position: relative;
@@ -94,6 +94,11 @@ body {
 .inputs .outputs {
     display: flex;
     flex-direction: row;
+    position: relative;
+}
+
+.boxinput {
+    width: 50px;
 }
 
 #output {
