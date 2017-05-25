@@ -51,25 +51,29 @@ body {
 }
 
 .link_container {
-    padding: 5px;
     margin: 10px 0;
     text-align: center;
-    background-color: lightblue;
     position: relative;
 }
 
 .pseudo_link {
     text-align: center;
     background-color: mediumpurple;
-    width: 20px;
-    height: 20px;
+    border-color: lightblue;
+    border-style: solid;
+    border-width: 2px;
+    width: 10px;
+    height: 10px;
 }
 
 .link {
     text-align: center;
     background-color: mediumvioletred;
-    width: 20px;
-    height: 20px;
+    border-color: lightblue;
+    border-style: solid;
+    border-width: 2px;
+    width: 10px;
+    height: 10px;
 }
 
 .tool:hover {
@@ -90,6 +94,14 @@ body {
 .inputs .outputs {
     display: flex;
     flex-direction: row;
+}
+
+#output {
+    right: 0;
+    bottom: 30%;
+    position: fixed;
+    background-color: lightcoral;
+    margin: 30px;
 }
 
 #save_button {
