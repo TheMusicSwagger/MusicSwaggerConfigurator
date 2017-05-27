@@ -259,7 +259,7 @@ function drawLineBetweenDiv(id_div1, id_div2) {
     context.stroke();
 }
 
-function get_link_tool_id(linkid) {
+function get_link_tool(linkid) {
     var parent = document.getElementById(linkid).parentNode;
     while (true) {
         if (parent.getAttribute("class") == "tool") {
@@ -274,7 +274,16 @@ function get_link_number(linkid) {
 }
 
 function get_linked(index) {
-    return [document.getElementById(get_link_tool_id("link_0_" + index.toString())), document.getElementById(get_link_tool_id("link_1_" + index.toString()))];
+    var link1 = "link_0_" + index.toString(),
+        link2 = "link_1_" + index.toString();
+    return [{
+            "toolid": get_link_tool_id(link1),
+            "linkid": get_link_number(link1)
+    },
+        {
+            "toolid": get_link_tool_id(link2),
+            "linkid": get_link_number(link2)
+    }];
 }
 
 function save_data() {
@@ -283,10 +292,10 @@ function save_data() {
     for (var i = 0; i < available_links.length; i++) {
         var a = get_linked(available_links[i]);
         var link = {
-            "BOX_ID_1": a[0].getAttribute("data-boxid"),
-            "LINK_ID_1": a[0][1],
-            "BOX_ID_2": a[1].getAttribute("data-boxid"),
-            "LINK_ID_2": a[1][1]
+            "BOX_ID_1": a[0]["toolid"],
+            "LINK_ID_1": a[0]["linkid"],
+            "BOX_ID_2": a[1]["toolid"],
+            "LINK_ID_2": a[1]["linkid"]
         };
         // json data to send
         // array("LINKS"=>array(array("BOX_ID_1"=>"1","LINK_ID_1"=>"1","BOX_ID_2"=>"2","LINK_ID_2"=>"1")),"BOXES"=>array(array("TYPE"=>"IN","BOX_ID"=>"1","SPEC_PARAM"=>"hello"),array("TYPE"=>"OUT","BOX_ID"=>"2","SPEC_PARAM"=>"hello2")))
