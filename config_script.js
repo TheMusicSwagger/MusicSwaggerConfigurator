@@ -2,16 +2,18 @@ var working_area, toolbar, canvas, context, save_form, config_input; // global v
 
 var tool_counter = 1;
 var pseudo_link_counter = 1;
-// out is 0
-
-
 var link_counter = 0;
+// for the tools, pseudo_links and links to have an unique identifier
+// (out is 0 at the beginning for tool and pseudo_link)
+
 var available_links = [];
 var available_boxes = [];
-
-var drop_counter = 0;
+// needed to know which box and link are on the page
 
 window.onload = function () {
+    /*
+        Event to wait for the page to be loaded before executing the code
+    */
     // getting basic elements
     working_area = document.getElementById("working_area");
     canvas = document.getElementById("main_cavas");
@@ -38,6 +40,9 @@ window.onload = function () {
 };
 
 window.onresize = function (event) {
+    /*
+        Event to handle the resizing of the window
+    */
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
     update_links();
@@ -45,11 +50,17 @@ window.onresize = function (event) {
 
 
 function get_link_id(link) {
+    /*
+        returns the link id number based on his id
+    */
     var s = link.getAttribute("id").split("_");
     return s[s.length - 1];
 }
 
 function remove_link(id) {
+    /*
+        Function that does the stuff to remove a link and replace it with a pseudo_link
+    */
     var index = available_links.indexOf(id);
     console.log(available_links);
     if (index > -1) {
@@ -68,6 +79,9 @@ function remove_link(id) {
 }
 
 function get_formatted_data(div, other) {
+    /*
+        Encode the data to be able to attach the data to a drag event (to store the old position of an object for exemple)
+    */
     // data to be send to the drop
     // uid|data... (sep with "," for example old coords)
     var data = "";
@@ -77,6 +91,9 @@ function get_formatted_data(div, other) {
 }
 
 function parse_formatted_data(data) {
+    /*
+        function used to retreive data encoded by get_formatted_data
+    */
     var r1 = data.split("|");
     var id = r1[0];
     var other = r1[1].split(",");
@@ -84,6 +101,9 @@ function parse_formatted_data(data) {
 }
 
 function create_pseudo_link() {
+    /*
+        function to help creating a pseudo_link when a link is destroyed or when a new object is created
+    */
     var pseudo_link = document.createElement("div");
     pseudo_link.setAttribute("class", "pseudo_link");
     pseudo_link.setAttribute("draggable", "true");
@@ -96,10 +116,9 @@ function create_pseudo_link() {
 }
 
 function drop(event) {
-    if (drop_counter == 0) {
-        return;
-    }
-    drop_counter--;
+    /*
+        Event triggered when a drop occurs (after a drag_start)
+    */
     var pdata = parse_formatted_data(event.dataTransfer.getData("text/plain"));
     var drop_target = event.target;
     var drop_target_class = drop_target.getAttribute("class");
@@ -168,11 +187,16 @@ function drop(event) {
 }
 
 function drag_over(event) {
+    /*
+        To be able to drag an object
+    */
     event.preventDefault();
 }
 
 function drag_start(event) {
-    drop_counter++;
+    /*
+        Event triggered when a drag is started
+    */
     var currently_dragged = event.target;
     var current_class = currently_dragged.getAttribute("class");
     console.log("Drag : " + current_class + " " + currently_dragged.getAttribute("id"));
@@ -227,6 +251,9 @@ function drag_start(event) {
 }
 
 function update_links() {
+    /*
+        do the stuff to display links
+    */
     clearCanvas();
     available_links.forEach(function (e) {
         new drawLineBetweenDiv("link_0_" + e, "link_1_" + e);
@@ -234,10 +261,16 @@ function update_links() {
 }
 
 function clearCanvas() {
+    /*
+        Clears the canvas to be able to redraw on it
+    */
     context.clearRect(0, 0, canvas.width, canvas.height);
 }
 
 function drawLineBetweenDiv(id_div1, id_div2) {
+    /*
+        draw a line between two links 
+    */
     var div1 = document.getElementById(id_div1),
         div2 = document.getElementById(id_div2);
     if (div1 == null) {
@@ -260,6 +293,9 @@ function drawLineBetweenDiv(id_div1, id_div2) {
 }
 
 function get_link_tool(linkid) {
+    /*
+        return the tool id where the link is attached
+    */
     var parent = document.getElementById(linkid).parentNode;
     while (true) {
         if (parent.getAttribute("class") == "tool") {
@@ -270,10 +306,16 @@ function get_link_tool(linkid) {
 }
 
 function get_link_number(linkid) {
-    return document.getElementById(linkid).getAttribute("data-linkid");
+    /*
+        return the number of the link_container of a link object
+    */
+    return document.getElementById(linkid).parentNode.getAttribute("data-linkid");
 }
 
 function get_linked(index) {
+    /*
+        return the two tools linked by the link number "index" and also on which link_container the link is attached to.
+    */
     var link1 = "link_0_" + index.toString(),
         link2 = "link_1_" + index.toString();
     return [{
