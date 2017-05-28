@@ -146,14 +146,12 @@ function drop(event) {
     var current_class = currently_dragged.getAttribute("class");
     console.log("Drop : " + current_class + " -> " + drop_target_class);
     if (current_class == "tool") {
-        if (drop_target_class == "working_area") {
+        if (drop_target_class == "toolbar" || (drop_target_class == "tool" && drop_target.parentNode.getAttribute("class") == "toolcontainer")) {
+            remove_box(currently_dragged);
+        } else {
             var offset = pdata[1];
             currently_dragged.style.left = (event.clientX + parseInt(offset[0], 10)) + "px";
             currently_dragged.style.top = (event.clientY + parseInt(offset[1], 10)) + "px";
-        } else if (drop_target_class == "toolbar") {
-            remove_box(currently_dragged);
-        } else if (drop_target_class == "tool" && drop_target.parentNode.getAttribute("class") == "toolcontainer") {
-            remove_box(currently_dragged);
         }
     } else if (current_class == "pseudo_link") {
         var parent_from = currently_dragged.parentNode;
