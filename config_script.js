@@ -7,8 +7,9 @@ var link_counter = 0;
 // (out is 0 at the beginning for tool and pseudo_link)
 
 var available_links = [];
-var available_boxes = [];
+var available_boxes = ["output"];
 // needed to know which box and link are on the page
+// (output will always be available)
 
 window.onload = function () {
     /*
@@ -62,7 +63,6 @@ function remove_link(id) {
         Function that does the stuff to remove a link and replace it with a pseudo_link
     */
     var index = available_links.indexOf(id);
-    console.log(available_links);
     if (index > -1) {
         var link0 = document.getElementById("link_0_" + id),
             link1 = document.getElementById("link_1_" + id);
@@ -74,8 +74,27 @@ function remove_link(id) {
     } else {
         console.log("Link doesn't exists !");
     }
-
     console.log(available_links);
+}
+
+function remove_box(box) {
+    /*
+        Used to destroy a box and the links attached to it
+    */
+
+    var index = available_boxes.indexOf(box.getAttribute("id"));
+    if (index > -1)
+        var links = box.querySelectorAll(".link");
+    if (links != null) {
+        for (var i = 0; i < links.length; i++) {
+            remove_link(get_link_id(links[i]));
+        }
+        box.parentNode.removeChild(box);
+        available_boxes.splice(index, 1);
+    } else {
+        console.log("Box doesn't exists !");
+    }
+    console.log(available_boxes);
 }
 
 function get_formatted_data(div, other) {
@@ -119,6 +138,7 @@ function drop(event) {
     /*
         Event triggered when a drop occurs (after a drag_start)
     */
+    event.stopPropagation();
     var pdata = parse_formatted_data(event.dataTransfer.getData("text/plain"));
     var drop_target = event.target;
     var drop_target_class = drop_target.getAttribute("class");
@@ -131,14 +151,7 @@ function drop(event) {
             currently_dragged.style.left = (event.clientX + parseInt(offset[0], 10)) + "px";
             currently_dragged.style.top = (event.clientY + parseInt(offset[1], 10)) + "px";
         } else if (drop_target_class == "toolbar") {
-            var links = currently_dragged.querySelectorAll(".link");
-            if (links != null) {
-                for (var i = 0; i < links.length; i++) {
-                    remove_link(get_link_id(links[i]));
-                }
-            }
-
-            currently_dragged.parentNode.removeChild(currently_dragged);
+            remove_box(currently_dragged);
         }
     } else if (current_class == "pseudo_link") {
         var parent_from = currently_dragged.parentNode;
@@ -197,6 +210,7 @@ function drag_start(event) {
     /*
         Event triggered when a drag is started
     */
+    event.stopPropagation();
     var currently_dragged = event.target;
     var current_class = currently_dragged.getAttribute("class");
     console.log("Drag : " + current_class + " " + currently_dragged.getAttribute("id"));
@@ -227,6 +241,9 @@ function drag_start(event) {
             currently_dragged.setAttribute("id", currently_dragged.getAttribute("id") + "_" + tool_counter.toString())
             currently_dragged.setAttribute("data-boxid", tool_counter.toString())
 
+            // store the new box into the available_boxes
+            available_boxes.push(currently_dragged.getAttribute("id"));
+
             // create links
             var links = currently_dragged.querySelectorAll(".link_container");
             for (var i = 0; i < links.length; i++) {
@@ -247,27 +264,26 @@ function drag_start(event) {
     } else if (current_class == "pseudo_link") {
         event.dataTransfer.setData("text/plain", get_formatted_data(currently_dragged, []));
     }
-    event.stopPropagation();
 }
 
 function update_links() {
     /*
         do the stuff to display links
     */
-    clearCanvas();
+    clear_canvas();
     available_links.forEach(function (e) {
-        new drawLineBetweenDiv("link_0_" + e, "link_1_" + e);
+        new draw_line_between_div("link_0_" + e, "link_1_" + e);
     });
 }
 
-function clearCanvas() {
+function clear_canvas() {
     /*
         Clears the canvas to be able to redraw on it
     */
     context.clearRect(0, 0, canvas.width, canvas.height);
 }
 
-function drawLineBetweenDiv(id_div1, id_div2) {
+function draw_line_between_div(id_div1, id_div2) {
     /*
         draw a line between two links 
     */
@@ -292,7 +308,7 @@ function drawLineBetweenDiv(id_div1, id_div2) {
     context.stroke();
 }
 
-function get_link_tool(linkid) {
+function get_link_tool_number(linkid) {
     /*
         return the tool id where the link is attached
     */
@@ -319,34 +335,54 @@ function get_linked(index) {
     var link1 = "link_0_" + index.toString(),
         link2 = "link_1_" + index.toString();
     return [{
-            "toolid": get_link_tool_id(link1),
+            "boxid": get_link_tool_number(link1),
             "linkid": get_link_number(link1)
     },
         {
-            "toolid": get_link_tool_id(link2),
+            "boxid": get_link_tool_number(link2),
             "linkid": get_link_number(link2)
     }];
 }
 
 function save_data() {
-    var dataDict;
+    /*
+        Format and send the data to the save page to store infos about the configuration in the database
+    */
+    var dataDict = {};
     var links = [];
     for (var i = 0; i < available_links.length; i++) {
-        var a = get_linked(available_links[i]);
-        var link = {
-            "BOX_ID_1": a[0]["toolid"],
-            "LINK_ID_1": a[0]["linkid"],
-            "BOX_ID_2": a[1]["toolid"],
-            "LINK_ID_2": a[1]["linkid"]
+        var lks = get_linked(available_links[i]);
+        var linkdata = {
+            "BOX_ID_1": lks[0]["boxid"],
+            "LINK_ID_1": lks[0]["linkid"],
+            "BOX_ID_2": lks[1]["boxid"],
+            "LINK_ID_2": lks[1]["linkid"]
         };
         // json data to send
-        // array("LINKS"=>array(array("BOX_ID_1"=>"1","LINK_ID_1"=>"1","BOX_ID_2"=>"2","LINK_ID_2"=>"1")),"BOXES"=>array(array("TYPE"=>"IN","BOX_ID"=>"1","SPEC_PARAM"=>"hello"),array("TYPE"=>"OUT","BOX_ID"=>"2","SPEC_PARAM"=>"hello2")))
-        links.push(link);
+        // array("LINKS"=>array(array("BOX_ID_1"=>"1","LINK_ID_1"=>"1","BOX_ID_2"=>"2","LINK_ID_2"=>"1")),
+        // "BOXES"=>array(array("TYPE"=>"IN","BOX_ID"=>"1","SPEC_PARAM"=>"hello"),array("TYPE"=>"OUT","BOX_ID"=>"2","SPEC_PARAM"=>"hello2"))
+        //)
+        links.push(linkdata);
     }
-    dataDict.push(links);
+    dataDict["LINKS"] = links;
+    var boxes = [];
     for (var i = 0; i < available_boxes.length; i++) {
-
+        var box = document.getElementById(available_boxes[i]);
+        var boxdata = {
+            "TYPE": box.getAttribute("data-toolid"),
+            "BOX_ID": box.getAttribute("data-boxid")
+        }
+        var input = box.querySelector("input");
+        if (input) {
+            boxdata["SPEC_PARAM"] = input.value;
+        } else {
+            boxdata["SPEC_PARAM"] = "";
+        }
+        boxes.push(boxdata);
     }
+    dataDict["BOXES"] = boxes;
+    console.log(dataDict);
+    console.log(JSON.stringify(dataDict));
     config_input.setAttribute("value", JSON.stringify(dataDict));
     save_form.submit();
 }
