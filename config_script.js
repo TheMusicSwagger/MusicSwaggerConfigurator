@@ -152,6 +152,8 @@ function drop(event) {
             currently_dragged.style.top = (event.clientY + parseInt(offset[1], 10)) + "px";
         } else if (drop_target_class == "toolbar") {
             remove_box(currently_dragged);
+        } else if (drop_target_class == "tool" && drop_target.parentNode.getAttribute("class") == "toolcontainer") {
+            remove_box(currently_dragged);
         }
     } else if (current_class == "pseudo_link") {
         var parent_from = currently_dragged.parentNode;
